@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>SceneQuest — Movies & TV</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <p id="multiple-selection-help" class="visually-hidden">For multiple selections, use Shift with the arrow keys to select a range, or hold Control on Windows or Command on Mac while selecting individual options.</p>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="SceneQuest home">SceneQuest<span class="brand-dot" aria-hidden="true">.</span></a>
+    <nav aria-label="Main navigation">
+      <button data-view="browse" aria-current="page">Browse</button>
+      <button data-view="recommendations">For you</button>
+      <button data-view="watchlist">Watchlist</button>
+      <button data-view="history">History</button>
+      <button data-view="dismissed">Not interested</button>
+    </nav>
+    <button id="open-preferences" class="preferences-button">Preferences</button>
+  </header>
+  <main id="main" tabindex="-1">
+    <div id="storage-warning" class="notice warning" role="status" hidden></div>
+    <div class="page-heading"><h1 id="page-title" tabindex="-1">Browse</h1><p id="page-context">Movies & TV</p></div>
+    <section id="browse-controls" aria-label="Browse controls">
+      <div class="browse-toolbar">
+        <div class="tabs" role="tablist" aria-label="Media type">
+          <button id="movie-tab" role="tab" aria-selected="true" aria-controls="results" data-media="movie">Movies</button>
+          <button id="tv-tab" role="tab" aria-selected="false" aria-controls="results" data-media="tv" tabindex="-1">TV shows</button>
+        </div>
+        <form id="search-form" role="search">
+          <label class="visually-hidden" for="search">Search titles</label>
+          <input id="search" type="search" placeholder="Search movie titles" maxlength="200" autocomplete="off">
+          <button type="button" id="clear-search" hidden>Clear</button>
+        </form>
+      </div>
+      <details id="filters-panel">
+        <summary>Discovery filters</summary>
+        <p id="search-help" class="muted" hidden>Clear title search to use discovery filters.</p>
+        <form id="filter-form">
+          <fieldset id="filter-fields"><legend class="visually-hidden">Discovery filters</legend>
+            <div class="filter-grid">
+              <label>Genres <span class="hint">Match any</span><select id="genres" name="genre_keys" multiple aria-describedby="multiple-selection-help" size="4"></select></label>
+              <label>Providers <span class="hint">Match any</span><select id="providers" name="provider_ids" multiple aria-describedby="multiple-selection-help" size="4"></select></label>
+              <label>Access type<select name="access_type"><option value="flatrate">Subscription</option><option value="free">Free</option><option value="ads">With ads</option><option value="rent">Rent</option><option value="buy">Buy</option></select></label>
+              <label>Minimum rating<input name="rating_min" type="number" min="0" max="10" step="0.1" placeholder="Any"></label>
+              <label>From year<input name="year_from" type="number" min="1870" max="2100" placeholder="Any"></label>
+              <label>To year<input name="year_to" type="number" min="1870" max="2100" placeholder="Any"></label>
+              <label>Original language<select name="original_language" id="original-language"></select></label>
+              <label>Maximum runtime <span class="hint" id="runtime-hint">Minutes</span><input name="runtime_max" type="number" min="1" max="1000" placeholder="Any"></label>
+            </div>
+            <div class="form-actions"><button type="submit" class="primary">Apply filters</button><button type="button" id="reset-filters">Reset filters</button></div>
+          </fieldset>
+        </form>
+        <p id="provider-status" class="muted" role="status"></p>
+      </details>
+    </section>
+    <section id="recommend-controls" aria-label="Recommendation controls" hidden>
+      <form id="recommend-form">
+        <div class="recommend-basics">
+          <label>Media<select id="recommend-media"><option value="both">Movies &amp; TV</option><option value="movie">Movies</option><option value="tv">TV shows</option></select></label>
+          <label class="checkbox-label"><input type="checkbox" id="include-watchlist"> Include watchlist titles</label>
+        </div>
+        <details><summary>Recommendation filters</summary>
+          <div class="filter-grid">
+            <label>Genres <span class="hint">Match any</span><select id="recommend-genres" multiple aria-describedby="multiple-selection-help" size="4"></select></label>
+            <label>Providers <span class="hint">Match any</span><select id="recommend-providers" multiple aria-describedby="multiple-selection-help" size="4"></select></label>
+            <label>Access type<select name="access_type"><option value="flatrate">Subscription</option><option value="free">Free</option><option value="ads">With ads</option><option value="rent">Rent</option><option value="buy">Buy</option></select></label>
+            <label>Minimum rating<input name="rating_min" type="number" min="0" max="10" step="0.1" placeholder="Any"></label>
+            <label>From year<input name="year_from" type="number" min="1870" max="2100" placeholder="Any"></label>
+            <label>To year<input name="year_to" type="number" min="1870" max="2100" placeholder="Any"></label>
+            <label>Original language<select id="recommend-language" name="original_language"></select></label>
+            <label>Maximum movie runtime <span class="hint">Minutes</span><input name="movie_runtime" type="number" min="1" max="1000" placeholder="Any"></label>
+            <label>Maximum episode runtime <span class="hint">Median minutes</span><input name="tv_runtime" type="number" min="1" max="1000" placeholder="Any"></label>
+          </div>
+          <p id="recommend-provider-status" class="muted" role="status"></p>
+        </details>
+        <div class="form-actions"><button id="recommend-submit" type="submit" class="primary">Generate recommendations</button></div>
+      </form>
+    </section>
+    <div class="results-toolbar"><p id="result-status" role="status" aria-live="polite" aria-atomic="true">Loading catalogue…</p><button id="retry" hidden>Try again</button></div>
+    <div id="results" class="title-grid" aria-busy="false"></div>
+    <div class="pagination" aria-label="Pagination"><button id="previous" disabled>Previous</button><span id="page-number"></span><button id="next" disabled>Next</button></div>
+  </main>
+  <footer><a href="#" id="open-about">About & credits</a><span>Your lists are saved in this browser.</span></footer>
+
+  <dialog id="title-dialog" aria-labelledby="detail-title">
+    <div class="dialog-top"><span>Title details</span><button data-close="title-dialog" aria-label="Close title details">Close</button></div>
+    <div id="detail-content"></div>
+  </dialog>
+  <dialog id="preferences-dialog" aria-labelledby="preferences-title">
+    <div class="dialog-top"><h2 id="preferences-title">Preferences</h2><button data-close="preferences-dialog">Close</button></div>
+    <form id="preferences-form">
+      <p class="muted">Preferences help order recommendations. Discovery filters decide which titles qualify.</p>
+      <div class="preference-grid">
+        <label>Media preference<select name="media_choice"><option value="both">Movies & TV</option><option value="movie">Movies</option><option value="tv">TV shows</option></select></label>
+        <label>Country<select name="region" id="preference-region"><option value="MY">Malaysia</option><option value="US">United States</option><option value="GB">United Kingdom</option></select></label>
+        <label>Display language<select name="display_language"><option value="en-US">English</option></select></label>
+        <label>Preferred original languages<select id="preferred-languages" multiple aria-describedby="multiple-selection-help" size="4"></select></label>
+        <label class="wide">Preferred genres<select id="preferred-genres" multiple aria-describedby="multiple-selection-help" size="6"></select></label>
+        <label>Movie providers<select id="movie-providers" multiple aria-describedby="multiple-selection-help" size="4"></select></label>
+        <label>TV providers<select id="tv-providers" multiple aria-describedby="multiple-selection-help" size="4"></select></label>
+      </div>
+      <p id="preference-status" role="status"></p>
+      <div class="form-actions"><button class="primary" type="submit" id="save-preferences">Save preferences</button></div>
+    </form>
+    <section class="privacy"><h3>Personal data</h3><p>Lists and feedback stay in this browser. Clearing site data, private browsing, or using another device can make them unavailable. Generating recommendations sends preferences, an aggregated taste profile, and excluded title identities to the server for that request. Personal recommendation inputs are not stored on the server. Posters load from TMDB’s image service, which receives normal image requests from your browser.</p><button id="open-reset" class="danger">Clear personal data</button></section>
+  </dialog>
+  <dialog id="reset-dialog" aria-labelledby="reset-title"><h2 id="reset-title">Clear personal data?</h2><p>This removes saved preferences, your watchlist, history, and dismissed titles from this browser.</p><div class="form-actions"><button data-close="reset-dialog" autofocus>Cancel</button><button id="confirm-reset" class="danger">Clear data</button></div></dialog>
+  <dialog id="about-dialog" aria-labelledby="about-title"><div class="dialog-top"><h2 id="about-title">About SceneQuest</h2><button data-close="about-dialog">Close</button></div><p>A personal project for discovering movies and TV.</p><a class="tmdb-credit" href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer"><img src="{{ url_for('static', filename='images/tmdb-logo.svg') }}" alt="The Movie Database (TMDB)" width="120" height="16"></a><p>This product uses the TMDB API but is not endorsed or certified by TMDB.</p><p>Watch-provider data is provided by JustWatch through TMDB. Availability is reported for the selected country and may change; confirm it before watching.</p><p><a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB</a> · <a href="https://www.justwatch.com/" target="_blank" rel="noopener noreferrer">JustWatch</a></p></dialog>
+  <script id="bootstrap" type="application/json">{{ bootstrap | tojson }}</script>
+  <script type="module" src="{{ url_for('static', filename='js/ui.js') }}"></script>
+</body>
+</html>
