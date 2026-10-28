@@ -135,6 +135,16 @@ class FoundationTests(unittest.TestCase):
             self.assertIn('/static/js/storage.js', checked)
             self.assertIn('/static/css/styles.css', checked)
 
+    def test_deployment_manifest_declares_all_runtime_dependencies(self):
+        import tomllib
+        root = Path(__file__).resolve().parent.parent
+        manifest = tomllib.loads((root / 'pyproject.toml').read_text())
+        declared = {value.casefold() for value in manifest['project']['dependencies']}
+        requirements = {line.strip().casefold() for line in (root / 'requirements.txt').read_text().splitlines()
+                        if line.strip() and not line.lstrip().startswith('#')}
+        self.assertEqual(declared, requirements)
+        self.assertEqual(manifest['tool']['vercel']['entrypoint'], 'run:app')
+
     def test_missing_token_is_a_clean_service_error(self):
         app = create_app(tmdb_client=TMDBClient(token="", session=FakeSession([])))
         with app.test_client() as client:

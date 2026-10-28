@@ -7,7 +7,7 @@
 - CSS, JavaScript, and images live in `public/static/`. Their URLs remain `/static/...`; Flask serves the same directory locally.
 - `.vercelignore` excludes local credentials, the virtual environment, tests, and local artifacts from CLI uploads. `.gitignore` excludes `.env`, other local environment files, and `.vercel/`.
 
-There is no frontend build command or output directory to enter. Vercel installs Python dependencies from `requirements.txt`. Local `.env` loading remains available; deployed credentials are supplied through Vercel's environment settings.
+There is no frontend build command or output directory to enter. Vercel can prefer `pyproject.toml` over `requirements.txt`, so the manifest explicitly declares all three runtime dependencies. Keep both lists synchronized; a regression test checks this. Local `.env` loading remains available; deployed credentials are supplied through Vercel's environment settings.
 
 ## 2. Push the prepared files
 
@@ -90,3 +90,9 @@ Saved lists on the Vercel domain start separately from localhost because browser
 - Firewall setup and plan limits: https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting
 
 The repository has been prepared and checked locally. An actual Vercel build, environment-variable setup, firewall configuration, and deployed smoke test still need to be completed in the user's account.
+
+## Recovering from a missing Flask import
+
+If runtime logs show `ModuleNotFoundError: No module named 'flask'`, confirm the deployed commit includes `[project].dependencies` in `pyproject.toml`. An entrypoint-only manifest can be selected without installing the packages listed separately in `requirements.txt`.
+
+Push the corrected manifest, then use the new Git deployment. If manually redeploying, select the latest commit and turn off **Use existing Build Cache** for the first retry. Ensure custom Install Command overrides are disabled and Root Directory is the repository root. The build logs should show Flask, requests, and python-dotenv being installed. Check `/health` after the deployment completes.
