@@ -22,7 +22,7 @@ ENV_FILE = Path(__file__).resolve().parent.parent / '.env'
 
 def create_app(*, tmdb_client=None):
     load_dotenv(ENV_FILE, override=False)
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder="../public/static", static_url_path="/static")
     app.config["MAX_CONTENT_LENGTH"] = 64 * 1024
     app.config["ENABLE_RATE_LIMITS"] = os.getenv("SCENEQUEST_RATE_LIMITS", "0") == "1"
     app.extensions["rate_limiter"] = RateLimiter()

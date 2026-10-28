@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createStore, STORAGE_KEY, defaultState, validState} from '../app/static/js/storage.js';
+import {createStore, STORAGE_KEY, defaultState, validState} from '../public/static/js/storage.js';
 
 function memoryStorage(raw = null) {
   const data = new Map(raw === null ? [] : [[STORAGE_KEY,raw]]);

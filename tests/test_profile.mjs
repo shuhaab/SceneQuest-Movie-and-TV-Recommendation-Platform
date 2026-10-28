@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {tasteProfile, exclusions} from '../app/static/js/profile.js';
+import {tasteProfile, exclusions} from '../public/static/js/profile.js';
 const entry = (key, sentiment, genres = ['drama'], language = 'en', date = '2026-01-01') => ({key, sentiment, action_at: date, snapshot: {genre_keys: genres, original_language: language}});
 test('smoothed affinities keep zero evidence and skip neutral or missing features', () => {
   const result = tasteProfile([entry('movie:1', 'liked'), entry('tv:1', 'disliked'), entry('movie:2', 'neutral'), entry('movie:3', 'liked', [], null)]);

@@ -112,6 +112,29 @@ class FoundationTests(unittest.TestCase):
             with patch('app.ENV_FILE', env_file), patch.dict(os.environ, {'TMDB_ACCESS_TOKEN': 'fixture-shell-token'}):
                 self.assertEqual(create_app().extensions['tmdb_client']._token, 'fixture-shell-token')
 
+    def test_public_assets_serve_with_existing_urls_and_module_imports(self):
+        import re
+        from urllib.parse import urljoin
+        app = create_app(tmdb_client=FakeTMDB())
+        with app.test_client() as client:
+            html = client.get('/').get_data(as_text=True)
+            paths = re.findall(r'(?:src|href)="(/static/[^"]+)"', html)
+            checked = set()
+            while paths:
+                path = paths.pop()
+                if path in checked:
+                    continue
+                checked.add(path)
+                response = client.get(path)
+                self.assertEqual(response.status_code, 200, path)
+                if path.endswith('.js'):
+                    self.assertIn('javascript', response.content_type)
+                    imports = re.findall(r"from ['\"](\.[^'\"]+)['\"]", response.get_data(as_text=True))
+                    paths.extend(urljoin(path, value) for value in imports)
+                response.close()
+            self.assertIn('/static/js/storage.js', checked)
+            self.assertIn('/static/css/styles.css', checked)
+
     def test_missing_token_is_a_clean_service_error(self):
         app = create_app(tmdb_client=TMDBClient(token="", session=FakeSession([])))
         with app.test_client() as client:

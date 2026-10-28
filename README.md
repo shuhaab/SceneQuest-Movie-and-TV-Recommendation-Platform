@@ -114,3 +114,7 @@ This is a focused accessibility review, not a formal conformance certification. 
 The local MVP milestones are complete. Public deployment remains optional and requires a production WSGI server, HTTPS, rate limits enabled, and configuration for the hosting platform’s trusted proxy.
 
 The latest overall assessment and remaining release work are recorded in [QA_REVIEW.md](QA_REVIEW.md).
+
+## Vercel deployment
+
+The entry point and static assets are prepared for Vercel. Follow [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md) for GitHub import, environment variables, firewall limits, and deployment checks. Public metadata caching remains per instance; use Vercel Firewall for deployed rate limiting.

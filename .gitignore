@@ -4,3 +4,8 @@ __pycache__/
 *.py[cod]
 .env
 artifacts/
+
+.vercel/
+.DS_Store
+.env.*
+!.env.example
